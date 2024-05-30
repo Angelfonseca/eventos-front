@@ -23,17 +23,33 @@ const login = () => {
     } else {
       localStorage.setItem('itpa-token', json.token);
       localStorage.setItem('user', JSON.stringify(json.user)); // Guardar información del usuario
-      router.push('/main');
+      const user = JSON.parse(localStorage.getItem('user'));
+      // Verificar si el campo isdocente existe y es verdadero
+      if (user.isdocente) {
+        router.push('/main');
+      } else {
+        router.push('/events');
+      }
       console.log(json);
     }
   })
+  .catch(err => {
+    console.log(err);
+    hasError.value = true;
+  });
 }
+
 const isAuth = window.localStorage.getItem('itpa-token');
 if (isAuth) {
-  router.push('/main');
+  const user = JSON.parse(localStorage.getItem('user'));
+  // Verificar si el campo isdocente existe y es verdadero
+  if (user && user.isdocente) {
+    router.push('/main');
+  } else {
+    router.push('/events');
+  }
 }
 </script>
-
 
 <template>
   <section class="bg-gray-50 dark:bg-gray-900">

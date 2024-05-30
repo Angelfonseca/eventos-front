@@ -1,9 +1,8 @@
-
 <template>
-<nav class="bg-white border-gray-200 dark:bg-gray-900">
+  <nav class="bg-white border-gray-200 dark:bg-gray-900">
     <div class="flex items-center justify-between">
-      <a href="http://pabellon.tecnm.mx/" class="flex items-center">
-        <img src="../../src/assets/nav-logo.png" class="h-8 mr-3" alt="Flowbite Logo" />
+      <a href="http://pabellon.tecnm.mx/" class="flex items-center" id="logo">
+        <img src="../../src/assets/nav-logo.png" class="h-8 mr-3" id="nav-logo" alt="Flowbite Logo" />
         <span class="text-2xl font-semibold dark:text-white">Eventos ITPA</span>
       </a>
       <button data-collapse-toggle="navbar-default" type="button" class="block md:hidden">
@@ -13,41 +12,69 @@
       </button>
       <div class="hidden w-full md:block md:w-auto" id="navbar-default">
         <ul class="font-medium flex flex-col md:flex-row md:space-x-4 md:mt-0">
-          <li>
+          <li class="opcion-nav" v-if="currentRoute !== '/main' && isDocente">
             <router-link to="/main" class="text-gray-900 dark:text-white hover:text-blue-700">
-              <i class="fas fa-home"></i> Inicio
+              <i class="fas fa-home"></i> Crear evento
             </router-link>
           </li>
-          <li>
-            <router-link to="/upload" class="text-gray-900 dark:text-white hover:text-blue-700">
-              <i class="fas fa-shopping-cart"></i> Subir credito
+          <li class="opcion-nav" v-if="currentRoute !== '/events'">
+            <router-link to="/events" class="text-gray-900 dark:text-white hover:text-blue-700">
+              <i class="fas fa-shopping-cart"></i> Eventos
             </router-link>
           </li>
-          <li><a
-          class="block py-2 pl-3 pr-4 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent"
-          @click="logout"
-          href="/"
-        >
-          Cerrar sesión
-        </a>
-      </li>
+          <li class = "opcion-nav" v-if="currentRoute !== '/myevents' && !isDocente">
+            <router-link to="/myevents" class="text-gray-900 dark:text-white hover:text-blue-700">
+              <i></i> Mis eventos
+            </router-link>
+          </li>
+          <li class="opcion-nav">
+            <a
+              
+              @click="logout"
+              href="#"
+            >
+              Cerrar sesión
+            </a>
+          </li>
         </ul>
       </div>
     </div>
   </nav>
-
-
 </template>
-<script>
-import {useRouter} from 'vue-router'
 
-export default {
-  methods: {
-    logout() {
-      localStorage.removeItem('itpa-token');
-      
-      useRouter.push('/');
-    }
-  }
+<script setup>
+import { useRouter, useRoute } from 'vue-router'
+import { computed } from 'vue'
+
+const router = useRouter()
+const route = useRoute()
+
+const currentRoute = computed(() => route.path)
+
+const isDocente = computed(() => {
+  const user = JSON.parse(localStorage.getItem('user'));
+  return user && user.isdocente ? user.isdocente : false;
+})
+
+const logout = () => {
+  localStorage.removeItem('itpa-token');
+  localStorage.removeItem('user');
+  router.push('/');
 }
 </script>
+
+<style scoped>
+#nav-logo {
+  width: 50px;
+  height: 50px;
+}
+#logo {
+  margin-left: 20px;
+}
+.opcion-nav {
+  margin-top: 8px;
+  margin-bottom: 8px;
+  margin-left: 20px;
+  margin-right: 20px;
+}
+</style>
