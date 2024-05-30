@@ -1,5 +1,5 @@
 <template>
-  <div class="evento" @click="redirectToEvent">
+  <div class="evento" @click="redirectToEvent" :key="evento._id">
     <div class="imagen">
       <img src="/eventimg.jpg" alt="Imagen genérica de evento">
     </div>
@@ -12,6 +12,9 @@
 </template>
 
 <script>
+import { useRouter } from 'vue-router';
+import { ref, watch } from 'vue'; // Importa 'watch' de Vue
+
 export default {
   props: {
     evento: {
@@ -19,71 +22,37 @@ export default {
       required: true,
     },
   },
-  methods: {
-    formatDate(date) {
+  setup(props) {
+    const router = useRouter();
+    const evento = ref(props.evento);
+
+    const formatDate = (date) => {
       const options = { year: 'numeric', month: 'long', day: 'numeric' };
       return new Date(date).toLocaleDateString(undefined, options);
-    },
-    redirectToEvent() {
-      const eventId = this.evento.id;
-      if (eventId) {
-        this.$router.push(`/events/${eventId}`);
-      } else {
-        console.error("Evento ID is undefined or null");
-      }
-    },
+    };
+
+    // Utiliza watch para observar cambios en la prop 'evento'
+    watch(() => props.evento, (newValue) => {
+      evento.value = newValue;
+    });
+
+    // const redirectToEvent = () => {
+    //   const eventId = evento.value._id || '';
+    //   if (eventId) {
+    //     router.push(`/events/${eventId}`);
+    //   } else {
+    //     console.error("Evento ID is undefined or null");
+    //   }
+    // };
+
+    return {
+      formatDate,
+      // redirectToEvent,
+    };
   },
 };
 </script>
 
 <style scoped>
-.evento {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  padding: 10px;
-  margin-bottom: 10px;
-  max-width: 290px;
-  /* Limit the maximum width of the component */
-  cursor: pointer;
-  /* Add cursor pointer to indicate clickable */
-}
-
-.imagen {
-  text-align: center;
-  margin-bottom: 10px;
-  width: 227px;
-  height: 227px;
-}
-
-.contenido {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  word-break: break-word;
-  /* Allow the text to break into multiple lines */
-  box-sizing: border-box;
-  flex-grow: 1;
-  /* Allow the div to expand vertically */
-}
-
-.titulo {
-  font-size: 1.5em;
-}
-
-.evento h3,
-.evento p {
-  margin: 5px 0;
-  max-width: 100%;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.evento img {
-  max-width: 100%;
-  height: auto;
-}
+/* Estilos */
 </style>
