@@ -2,12 +2,11 @@
   <Baselayout>
     <div>
       <h1 class = "titulo" >Mis Eventos</h1>
-      <EventDetailView v-if="isEventDetailVisible" :event="selectedEvent" @close="closeEventDetail" />
       <div v-if="loading">Cargando eventos...</div>
       <div v-else class="eventos-container">
         <div class="columna" v-for="(column, index) in columnas" :key="index"
           :class="{ 'ultiple-eventos': column.length > 1 }">
-          <Evento v-for="evento in column" :key="evento.id" :evento="evento" class="evento" @click="openEventDetail(evento)" />
+          <Evento v-for="evento in column" :key="evento.id" :evento="evento" class="evento" />
         </div>
       </div>
     </div>
@@ -17,34 +16,27 @@
 <script>
 import Evento from '../components/evento.vue';
 import Baselayout from '../layout/BaseLayout.vue';
-import { ref, computed, onMounted, watchEffect } from 'vue'; // Import necessary functions from Vue
-import EventDetailView from './EventDetailView.vue';
-const userId = JSON.parse(localStorage.getItem('user')).username;
 
 export default {
-  props: {
-    evento: {
-      type: Object,
-      required: true,
-    },
-  },
   components: {
     Evento,
     Baselayout,
-    EventDetailView,
   },
-  setup() {
-    const eventos = ref([]);
-    const loading = ref(true);
-    const selectedEvent = ref(null);
-
-    const columnas = computed(() => {
+  data() {
+    return {
+      eventos: [],
+      loading: true,
+      userUsername: ''
+    };
+  },
+  computed: {
+    columnas() {
       const eventosPorColumna = 2;
       const columnas = [];
       let temp = [];
 
-      for (let i = 0; i < eventos.value.length; i++) {
-        temp.push(eventos.value[i]);
+      for (let i = 0; i < this.eventos.length; i++) {
+        temp.push(this.eventos[i]);
 
         if (temp.length === eventosPorColumna) {
           columnas.push(temp);
@@ -57,43 +49,35 @@ export default {
       }
 
       return columnas;
-    });
-
-    onMounted(async () => {
-      try {
-        const response = await fetch(`http://localhost:3000/api/events/user/${userId}`);
-        const data = await response.json();
-        eventos.value = data;
-        loading.value = false;
-        console.log('Eventos cargados:', eventos.value);
-      } catch (error) {
-        console.error('Error al cargar eventos:', error);
-        loading.value = false;
+    },
+  },
+  async mounted() {
+    try {
+      const user = JSON.parse(localStorage.getItem('user'));
+      if (!user || !user.username) {
+        throw new Error('No se pudo obtener el nombre de usuario');
       }
-    });
+      const userUsername = user.username;
+      const apiUrl = `http://localhost:3000/api/events/user/${userUsername}`;
+      console.log('Ruta de la API:', apiUrl);
+      
+      const response = await fetch(apiUrl);
+      const data = await response.json();
 
-    // Define isEventDetailVisible and methods related to EventDetailView
-    const isEventDetailVisible = ref(false);
+      // Verificar que los datos sean un array
+      if (!Array.isArray(data)) {
+        throw new Error('La respuesta de la API no es un array');
+      }
 
-    const openEventDetail = (event) => {
-      selectedEvent.value = event;
-      isEventDetailVisible.value = true;
-    };
+      console.log('Respuesta de la API:', data); // Imprime la respuesta de la API
 
-    const closeEventDetail = () => {
-      selectedEvent.value = null;
-      isEventDetailVisible.value = false;
-    };
-
-    return {
-      eventos,
-      loading,
-      selectedEvent,
-      columnas,
-      isEventDetailVisible,
-      openEventDetail,
-      closeEventDetail,
-    };
+      this.eventos = data;
+      console.log('Eventos cargados:', this.eventos); // Verificar los datos cargados
+      this.loading = false;
+    } catch (error) {
+      console.error('Error al cargar eventos:', error);
+      this.loading = false;
+    }
   },
 };
 </script>
@@ -115,7 +99,6 @@ export default {
 .evento {
   margin-bottom: 10px;
   max-width: 100%; /* Evitar que un evento tome más del ancho de la columna */
-  cursor: pointer;
 }
 
 .columna.multiple-eventos {

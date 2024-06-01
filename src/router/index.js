@@ -25,7 +25,7 @@ const router = createRouter({
       component: EventsView, 
     },
     {
-      path: '/TEST', // Ruta dinámica para el detalle del evento
+      path: '/events/:id', // Ruta dinámica para el detalle del evento
       name: 'event-detail',
       component: EventDetailView, 
       props: true // Habilita pasar props a la vista
