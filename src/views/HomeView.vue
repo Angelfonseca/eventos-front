@@ -1,29 +1,29 @@
 <template>
   <BaseLayout>
     <div class="main-container">
+      <h1 id = "titulo">NUEVO EVENTO</h1>
       <section class="nuevo-evento">
         <div class="eventos-contenedor">
-          <h2>NUEVO EVENTO</h2>
           <form @submit.prevent="submitEvent" id="formulario-evento">
             <div class="campo">
-              <label for="title">Título:</label>
+              <label for="title" class = "preg">Título:</label>
               <input type="text" v-model="formData.title" id="title" name="title" required class="pregunta">
             </div>
             <div class="campo">
-              <label for="description">Descripción:</label>
+              <label for="description" class = "preg">Descripción:</label>
               <textarea v-model="formData.description" id="description" name="description" required
                 class="pregunta"></textarea>
             </div>
             <div class="campo">
-              <label for="eventDate">Fecha del Evento:</label>
+              <label for="eventDate" class = "preg">Fecha del Evento:</label>
               <input type="date" v-model="formData.eventDate" id="eventDate" name="eventDate" required class="pregunta">
             </div>
             <div class="campo">
-              <label for="eventTime">Hora del Evento:</label>
+              <label for="eventTime" class = "preg">Hora del Evento:</label>
               <input type="time" v-model="formData.eventTime" id="eventTime" name="eventTime" required class="pregunta">
             </div>
             <div class="campo">
-              <label>Para:</label>
+              <label class = "preg">Para:</label>
               <div class="checkbox-group">
                 <input type="checkbox" id="ITIC" class="checkbox" v-model="formData.designedfor" value="ITIC">
                 <label for="designedfor-ITIC">ITIC</label>
@@ -37,9 +37,7 @@
                 <label for="Getion">Gestión Empresarial</label>
               </div>
             </div>
-            <button type="submit"
-              class="w-full text-white bg-blue-500 hover:bg-blue-600 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-500 dark:hover:bg-blue-600 dark:focus:ring-blue-800 backdrop-blur-sm">Crear
-              Evento</button>
+            <button type="submit" class="boton-azul">Crear Evento</button>
           </form>
         </div>
       </section>
@@ -135,7 +133,6 @@ export default {
   max-height: 200px;
 }
 
-
 .checkbox-group {
   display: flex;
   flex-wrap: wrap;
@@ -144,12 +141,12 @@ export default {
 
 .main-container {
   background-color: rgb(216, 216, 216);
-  /* Fondo gris */
   display: flex;
   justify-content: center;
   align-items: center;
   height: 90vh;
   width: 100%;
+  flex-direction: column;
 }
 
 .campo {
@@ -157,8 +154,11 @@ export default {
   display: flex;
   align-items: center;
   flex-direction: column;
-  
+}
 
+.preg {
+  font-size: 1.2rem;
+  font-weight: bold;
 }
 .pregunta {
   border-bottom: 1px solid #ccc;
@@ -166,13 +166,21 @@ export default {
   justify-content: center;
   align-items: center;
   
+}
 
-}
 #description {
-width: 75%;
+  width: 75%;
 }
+
 #title {
   width: 55%;
+}
+
+#titulo {
+  margin-bottom: 20px;
+  font-size: 2rem;
+  font-weight: bold;
+  text-align: center;
 }
 
 .eventos-contenedor {
@@ -201,7 +209,9 @@ width: 75%;
   color: white;
   border: none;
   cursor: pointer;
-  padding: 50px;
+  padding: 15px;
+  border-radius: 5px;
+  width: 100%;
 }
 
 .boton-azul:hover {

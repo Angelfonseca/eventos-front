@@ -1,15 +1,15 @@
 <template>
   <Baselayout>
     <div>
-      <h1 class = "titulo">Eventos</h1>
+      <h1 class="titulo">Eventos</h1>
+      <EventDetailView v-if="isEventDetailVisible" :event="selectedEvent" @close="closeEventDetail" />
       <div v-if="loading">Cargando eventos...</div>
       <div v-else class="eventos-container">
         <div class="columna" v-for="(column, index) in columnas" :key="index"
           :class="{ 'ultiple-eventos': column.length > 1 }">
-          <Evento v-for="evento in column" :key="evento.id" :evento="evento" />
+          <Evento v-for="evento in column" :key="evento.id" :evento="evento" class="evento" @click="openEventDetail(evento)" />
         </div>
       </div>
-      <router-view :event="selectedEvent" v-if="selectedEvent" />
     </div>
   </Baselayout>
 </template>
@@ -17,7 +17,10 @@
 <script>
 import Evento from '../components/evento.vue';
 import Baselayout from '../layout/BaseLayout.vue';
-import { useRouter } from 'vue-router';
+import { ref, computed, onMounted, watchEffect } from 'vue'; // Import necessary functions from Vue
+
+// Import EventDetailView here
+import EventDetailView from './EventDetailView.vue';
 
 export default {
   props: {
@@ -29,34 +32,20 @@ export default {
   components: {
     Evento,
     Baselayout,
+    EventDetailView, // Include EventDetailView component
   },
   setup() {
-    const router = useRouter();
+    const eventos = ref([]);
+    const loading = ref(true);
+    const selectedEvent = ref(null);
 
-    const navigateToEvent = (evento) => {
-      const eventId = evento.id;
-      router.push(`/events/${eventId}`);
-    };
-
-    return {
-      navigateToEvent,
-    };
-  },
-  data() {
-    return {
-      eventos: [],
-      loading: true,
-      selectedEvent : null,
-    };
-  },
-  computed: {
-    columnas() {
+    const columnas = computed(() => {
       const eventosPorColumna = 2;
       const columnas = [];
       let temp = [];
 
-      for (let i = 0; i < this.eventos.length; i++) {
-        temp.push(this.eventos[i]);
+      for (let i = 0; i < eventos.value.length; i++) {
+        temp.push(eventos.value[i]);
 
         if (temp.length === eventosPorColumna) {
           columnas.push(temp);
@@ -69,29 +58,48 @@ export default {
       }
 
       return columnas;
-    },
+    });
+
+    onMounted(async () => {
+      try {
+        const response = await fetch('http://localhost:3000/api/events');
+        const activeEvents = await fetch('http://localhost:3000/api/events/active');
+        const data = await response.json();
+        eventos.value = data;
+        loading.value = false;
+        console.log('Eventos cargados:', eventos.value);
+      } catch (error) {
+        console.error('Error al cargar eventos:', error);
+        loading.value = false;
+      }
+
+    });
+
+    // Define isEventDetailVisible and methods related to EventDetailView
+    const isEventDetailVisible = ref(false);
+
+    const openEventDetail = (event) => {
+      selectedEvent.value = event;
+      isEventDetailVisible.value = true;
+    };
+
+    const closeEventDetail = () => {
+      selectedEvent.value = null;
+      isEventDetailVisible.value = false;
+    };
+
+    return {
+      eventos,
+      loading,
+      selectedEvent,
+      columnas,
+      isEventDetailVisible,
+      openEventDetail,
+      closeEventDetail,
+    };
   },
-  async mounted() {
-    try {
-      const response = await fetch('http://localhost:3000/api/events');
-      const data = await response.json();
-      this.eventos = data;
-      this.loading = false;
-       
-    } catch (error) {
-      console.error('Error al cargar eventos:', error);
-      this.loading = false;
-    }
-  },
-  watch: {
-    $route(to, from) {
-      const eventId = parseInt(to.params.id);
-      this.selectedEvent = this.eventos.find((evento) => evento.id === eventId);
-    }
-  }
 };
 </script>
-
 
 <style scoped>
 .eventos-container {
