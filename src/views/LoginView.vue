@@ -3,7 +3,6 @@ import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useToast } from 'vue-toast-notification'
 
-const $toast = useToast()
 const router = useRouter()
 const hasError = ref(false)
 const form = ref({
@@ -27,10 +26,12 @@ const login = () => {
       localStorage.setItem('user', JSON.stringify(json.user)); // Guardar información del usuario
       const user = JSON.parse(localStorage.getItem('user'));
       // Verificar si el campo isdocente existe y es verdadero
-      if (user.isdocente) {
+      if (user && user.isdocente) {
         router.push('/main');
+        useToast().success('Bienvenido Admin!');
       } else {
         router.push('/events');
+        useToast().success('Bienvenido Estudiante!');
       }
       console.log(json);
     }
@@ -38,19 +39,23 @@ const login = () => {
   .catch(err => {
     console.log(err);
     hasError.value = true;
+    useToast().error('Error al iniciar sesión');
   });
 }
 
 const isAuth = window.localStorage.getItem('itpa-token');
 if (isAuth) {
-  const user = JSON.parse(localStorage.getItem('user'));
-  // Verificar si el campo isdocente existe y es verdadero
-  if (user && user.isdocente) {
-    router.push('/main');
-    $toast.success('Bienvenido Administrador!');
-  } else {
-    router.push('/events');
-    $toast.success('Bienvenido Estudiante!');
+  try {
+    const user = JSON.parse(localStorage.getItem('user'));
+    // Verificar si el campo isdocente existe y es verdadero
+    if (user && user.isdocente) {
+      router.push('/main');
+    } else {
+      router.push('/events');
+    }
+  } catch (error) {
+    console.error('Error parsing user from localStorage', error);
+    // Handle the case where the user data is corrupted or not present
   }
 }
 </script>
