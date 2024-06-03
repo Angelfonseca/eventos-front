@@ -8,6 +8,7 @@
       <p class="descripcion">{{ evento.description }}</p>
       <p><strong>Fecha:</strong> {{ formatDate(evento.eventDate) }}</p>
       <p><strong>Hora:</strong> {{ formatTime(evento.eventDate) }}</p>
+      <p><strong>Para:</strong> {{ evento.designedfor }}</p>
     </div>
     <button v-if="isDocente" @click.stop="deleteEvent" class="boton-rojo">Eliminar Evento</button>
     <button v-if="!isDocente && isRegistered && currentRoute !== '/events'" @click.stop="deleteAssistance"
