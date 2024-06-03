@@ -84,6 +84,10 @@ export default {
         visualizedby: 0,
         aceptedAssistance: [],
       };
+      if (!title || !description || !eventDate || !eventTime || !designedfor.length) {
+        $toast.error('Por favor, llena todos los campos');
+        return;
+      }
 
       fetch('http://localhost:3000/api/events', {
         method: 'POST',

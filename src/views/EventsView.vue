@@ -4,9 +4,9 @@
       <h1 class="titulo">Eventos</h1>
       <EventDetailView v-if="isEventDetailVisible" :event="selectedEvent" @close="closeEventDetail" />
       <div v-if="loading">Cargando eventos...</div>
-      <div v-else class="eventos-container">
+      <div v-else class="eventos-container" style="max-height: 750px; overflow-y: auto;">
         <div class="columna" v-for="(column, index) in columnas" :key="index"
-          :class="{ 'ultiple-eventos': column.length > 1 }">
+          :class="{ 'multiple-eventos': column.length > 1 }">
           <Evento v-for="evento in column" :key="evento.id" :evento="evento" class="evento" @click="openEventDetail(evento)" />
         </div>
       </div>
@@ -117,14 +117,12 @@ export default {
 
 .evento {
   margin-bottom: 10px;
-  max-width: 100%; /* Evitar que un evento tome más del ancho de la columna */
+  padding: 10px;
+  background-color: #f0f0f0; /* Fondo gris claro para resaltar el evento */
+  border-radius: 5px;
   cursor: pointer;
 }
 
-.columna.multiple-eventos {
-  display: grid;
-  grid-template-rows: repeat(auto-fill, minmax(100px, auto)); /* Establecer alto mínimo y máximo para cada fila en la columna */
-}
 .titulo {
   text-align: center;
   font-size: 3em; /* Ajusta este valor para hacer la letra más grande */

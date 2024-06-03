@@ -1,12 +1,12 @@
 <template>
   <Baselayout>
     <div>
-      <h1 class = "titulo" >Mis Eventos</h1>
+      <h1 class="titulo">Mis Eventos</h1>
       <EventDetailView v-if="isEventDetailVisible" :event="selectedEvent" @close="closeEventDetail" />
       <div v-if="loading">Cargando eventos...</div>
-      <div v-else class="eventos-container">
+      <div v-else class="eventos-container" style="max-height: 750px; overflow-y: auto;">
         <div class="columna" v-for="(column, index) in columnas" :key="index"
-          :class="{ 'ultiple-eventos': column.length > 1 }">
+          :class="{ 'multiple-eventos': column.length > 1 }">
           <Evento v-for="evento in column" :key="evento.id" :evento="evento" class="evento" @click="openEventDetail(evento)" />
         </div>
       </div>
@@ -17,17 +17,10 @@
 <script>
 import Evento from '../components/evento.vue';
 import Baselayout from '../layout/BaseLayout.vue';
-import { ref, computed, onMounted } from 'vue'; 
+import { ref, computed, onMounted } from 'vue';
 import EventDetailView from './EventDetailView.vue';
-const userId = JSON.parse(localStorage.getItem('user')).username;
 
 export default {
-  props: {
-    evento: {
-      type: Object,
-      required: true,
-    },
-  },
   components: {
     Evento,
     Baselayout,
@@ -37,6 +30,19 @@ export default {
     const eventos = ref([]);
     const loading = ref(true);
     const selectedEvent = ref(null);
+    const isEventDetailVisible = ref(false);
+
+    // Check if the user is in localStorage and handle if not
+    const user = localStorage.getItem('user');
+    if (!user) {
+      console.error('No user found in localStorage');
+      // Handle the case when the user is not found in localStorage, e.g., redirect to login
+      // Here we can redirect to login page or show a message
+      window.location.href = '/login'; // example of redirecting to a login page
+      return;
+    }
+
+    const userId = JSON.parse(user).username;
 
     const columnas = computed(() => {
       const eventosPorColumna = 2;
@@ -71,9 +77,6 @@ export default {
         loading.value = false;
       }
     });
-
-    // Define isEventDetailVisible and methods related to EventDetailView
-    const isEventDetailVisible = ref(false);
 
     const openEventDetail = (event) => {
       selectedEvent.value = event;
@@ -114,13 +117,17 @@ export default {
 
 .evento {
   margin-bottom: 10px;
-  max-width: 100%; /* Evitar que un evento tome más del ancho de la columna */
+  padding: 10px;
+  background-color: #f0f0f0; /* Fondo gris claro para resaltar el evento */
+  border-radius: 5px;
   cursor: pointer;
 }
-
-.columna.multiple-eventos {
-  display: grid;
-  grid-template-rows: repeat(auto-fill, minmax(100px, auto)); /* Establecer alto mínimo y máximo para cada fila en la columna */
+.evento-multiple {
+  margin-bottom: 5px;
+  padding: 5px;
+  background-color: #f9f9f9; /* Fondo ligeramente más claro para eventos múltiples */
+  border-radius: 3px;
+  cursor: pointer;
 }
 .titulo {
   text-align: center;

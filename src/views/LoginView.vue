@@ -1,7 +1,9 @@
 <script setup>
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { useToast } from 'vue-toast-notification'
 
+const $toast = useToast()
 const router = useRouter()
 const hasError = ref(false)
 const form = ref({
@@ -45,8 +47,10 @@ if (isAuth) {
   // Verificar si el campo isdocente existe y es verdadero
   if (user && user.isdocente) {
     router.push('/main');
+    $toast.success('Bienvenido Administrador!');
   } else {
     router.push('/events');
+    $toast.success('Bienvenido Estudiante!');
   }
 }
 </script>
